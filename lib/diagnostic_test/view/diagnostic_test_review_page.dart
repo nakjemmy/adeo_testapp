@@ -22,212 +22,223 @@ class DiagnosticTestView extends StatelessWidget {
   const DiagnosticTestView({super.key});
 
   bool get questionHasExplanation => true;
-  bool get isShowingQuestionDetails => false;
+  bool get isShowingQuestionDetails => true;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Row(
-      children: [
-        Expanded(
-          flex: 1,
-          child: Container(
-            padding: const EdgeInsets.all(64),
-            color: const Color(0xfff6f6f6),
-            child: Column(
-              children: [
-                const MainScoreSummary(),
-                const SizedBox(height: 10),
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 8),
-                  child: Divider(thickness: 5, color: Colors.white),
-                ),
-                const SizedBox(height: 30),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(30),
-                  child: ColoredBox(
-                    color: AppColors.reviewPrimaryColor,
-                    child: LayoutBuilder(builder: (context, constraints) {
-                      return ToggleButtons(
-                        isSelected: const [true, false],
-                        fillColor: const Color(0xFF2589ce),
-                        selectedColor: AppColors.reviewPrimaryColor,
-                        borderWidth: 0,
-                        borderColor: Colors.transparent,
-                        children: <Widget>[
-                          SizedBox(
-                            width: constraints.maxWidth * .3,
-                            child: const Text(
-                              'Topics',
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.white,
-                                fontWeight: FontWeight.w600,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
+      body: SingleChildScrollView(
+        child: Row(
+          children: [
+            Expanded(
+              child: Container(
+                height: MediaQuery.of(context).size.height,
+                padding: const EdgeInsets.all(64),
+                color: const Color(0xfff6f6f6),
+                child: ListView(
+                  children: [
+                    Column(
+                      children: [
+                        const MainScoreSummary(),
+                        const SizedBox(height: 10),
+                        const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 8),
+                          child: Divider(thickness: 5, color: Colors.white),
+                        ),
+                        const SizedBox(height: 30),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(30),
+                          child: ColoredBox(
+                            color: AppColors.reviewPrimaryColor,
+                            child:
+                                LayoutBuilder(builder: (context, constraints) {
+                              return ToggleButtons(
+                                isSelected: const [true, false],
+                                fillColor: const Color(0xFF2589ce),
+                                selectedColor: AppColors.reviewPrimaryColor,
+                                borderWidth: 0,
+                                borderColor: Colors.transparent,
+                                children: <Widget>[
+                                  SizedBox(
+                                    width: constraints.maxWidth * .3,
+                                    child: const Text(
+                                      'Topics',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: constraints.maxWidth * .3,
+                                    child: const Text(
+                                      'Questions',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                                ],
+                                onPressed: (int index) {},
+                              );
+                            }),
                           ),
-                          SizedBox(
-                            width: constraints.maxWidth * .3,
-                            child: const Text(
-                              'Questions',
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.white,
-                                fontWeight: FontWeight.w600,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        ],
-                        onPressed: (int index) {},
-                      );
-                    }),
-                  ),
+                        ),
+                        const SizedBox(height: 50),
+                        SizedBox(
+                          height: MediaQuery.of(context).size.height * .5,
+                          child: buildTopics(),
+                        ),
+                        const SizedBox(height: 50),
+                        buildSummaryActions(),
+                      ],
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 50),
-                SizedBox(
-                  height: MediaQuery.of(context).size.height * .5,
-                  child: buildTopics(),
-                ),
-                const SizedBox(height: 50),
-                buildSummaryActions(),
-              ],
+              ),
             ),
-          ),
-        ),
-        Expanded(
-          flex: 2,
-          child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 40),
-            color: AppColors.darkBlue,
-            child: isShowingQuestionDetails
-                ? Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            Expanded(
+              flex: 2,
+              child: Container(
+                height: MediaQuery.of(context).size.height,
+                padding:
+                    const EdgeInsets.symmetric(vertical: 24, horizontal: 40),
+                color: AppColors.darkBlue,
+                child: isShowingQuestionDetails
+                    ? Column(
                         children: [
                           Row(
-                            children: [],
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                children: [],
+                              ),
+                              OutlinedButton(
+                                onPressed: () {},
+                                style: OutlinedButton.styleFrom(
+                                  primary: AppColors.reviewPrimaryColor,
+                                  side: const BorderSide(
+                                    color: AppColors.reviewBodyTextColor,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                ),
+                                child: const Padding(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 20,
+                                    vertical: 14,
+                                  ),
+                                  child: Text(
+                                    'History',
+                                    style: TextStyle(
+                                      color: AppColors.reviewBodyTextColor,
+                                    ),
+                                  ),
+                                ),
+                              )
+                            ],
                           ),
-                          OutlinedButton(
-                            onPressed: () {},
-                            style: OutlinedButton.styleFrom(
-                              primary: AppColors.reviewPrimaryColor,
-                              side: const BorderSide(
-                                color: AppColors.reviewBodyTextColor,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                            ),
-                            child: const Padding(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 20,
-                                vertical: 14,
-                              ),
-                              child: Text(
-                                'History',
-                                style: TextStyle(
-                                  color: AppColors.reviewBodyTextColor,
-                                ),
-                              ),
-                            ),
-                          )
-                        ],
-                      ),
-                      const SizedBox(height: 50),
-                      Expanded(
-                        child: ListView.builder(
-                          itemCount: 6,
-                          itemBuilder: (BuildContext context, int index) {
-                            return Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 20),
-                              child: ReviewQuestionItem(
-                                text:
-                                    'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse',
-                                index: index,
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    ],
-                  )
-                : Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text(
-                        'This was a free diagnostic test',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 50,
-                        ),
-                      ),
-                      const SizedBox(height: 50),
-                      const Text(
-                        'Buy a subscription to unlock the entire course',
-                        style: TextStyle(
-                          color: AppColors.reviewBodyTextColor,
-                          fontSize: 30,
-                          fontStyle: FontStyle.italic,
-                        ),
-                      ),
-                      const SizedBox(height: 120),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          SizedBox(
-                            width: 150,
-                            height: 60,
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                primary: const Color(0xff07c4ff),
-                                side: BorderSide.none,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(2.4),
-                                ),
-                              ),
-                              onPressed: () {},
-                              child: const Text(
-                                'Store',
-                                style: TextStyle(
-                                  fontSize: 30,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          SizedBox(
-                            width: 150,
-                            height: 60,
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                primary: const Color(0xffff8071),
-                                side: BorderSide.none,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(2.4),
-                                ),
-                              ),
-                              onPressed: () {},
-                              child: const Text(
-                                'Home',
-                                style: TextStyle(
-                                  fontSize: 30,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
+                          const SizedBox(height: 50),
+                          Expanded(
+                            child: ListView.builder(
+                              itemCount: 6,
+                              itemBuilder: (BuildContext context, int index) {
+                                return Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 20),
+                                  child: ReviewQuestionItem(
+                                    text:
+                                        'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse',
+                                    index: index,
+                                  ),
+                                );
+                              },
                             ),
                           ),
                         ],
                       )
-                    ],
-                  ),
-          ),
-        )
-      ],
-    ));
+                    : Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text(
+                            'This was a free diagnostic test',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 50,
+                            ),
+                          ),
+                          const SizedBox(height: 50),
+                          const Text(
+                            'Buy a subscription to unlock the entire course',
+                            style: TextStyle(
+                              color: AppColors.reviewBodyTextColor,
+                              fontSize: 30,
+                              fontStyle: FontStyle.italic,
+                            ),
+                          ),
+                          const SizedBox(height: 120),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              SizedBox(
+                                width: 150,
+                                height: 60,
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    primary: const Color(0xff07c4ff),
+                                    side: BorderSide.none,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(2.4),
+                                    ),
+                                  ),
+                                  onPressed: () {},
+                                  child: const Text(
+                                    'Store',
+                                    style: TextStyle(
+                                      fontSize: 30,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              SizedBox(
+                                width: 150,
+                                height: 60,
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    primary: const Color(0xffff8071),
+                                    side: BorderSide.none,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(2.4),
+                                    ),
+                                  ),
+                                  onPressed: () {},
+                                  child: const Text(
+                                    'Home',
+                                    style: TextStyle(
+                                      fontSize: 30,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          )
+                        ],
+                      ),
+              ),
+            )
+          ],
+        ),
+      ),
+    );
   }
 
   Widget buildSummaryActions() {
