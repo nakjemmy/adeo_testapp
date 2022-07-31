@@ -67,8 +67,7 @@ class DiagnosticTestView extends StatelessWidget {
                       color: Theme.of(context).colorScheme.secondary,
                       child: Row(
                         children: [
-                          QuestionNavButton(
-                            context: context,
+                          const QuestionNavButton(
                             icon: Icons.chevron_left,
                           ),
                           Expanded(
@@ -91,8 +90,7 @@ class DiagnosticTestView extends StatelessWidget {
                               ),
                             ),
                           ),
-                          QuestionNavButton(
-                            context: context,
+                          const QuestionNavButton(
                             icon: Icons.chevron_right,
                           ),
                         ],
@@ -121,15 +119,13 @@ class DiagnosticTestView extends StatelessWidget {
                         ),
                       ),
                       Row(
-                        children: [
+                        children: const [
                           Expanded(
-                            child: AnswerNavButton(
-                                context: context, text: 'Previous'),
+                            child: AnswerNavButton(text: 'Previous'),
                           ),
-                          const SizedBox(width: 1),
+                          SizedBox(width: 1),
                           Expanded(
-                            child:
-                                AnswerNavButton(context: context, text: 'Next'),
+                            child: AnswerNavButton(text: 'Next'),
                           ),
                         ],
                       )
@@ -190,11 +186,9 @@ class AnswerItem extends StatelessWidget {
 class QuestionNavButton extends StatelessWidget {
   const QuestionNavButton({
     super.key,
-    required this.context,
     required this.icon,
   });
 
-  final BuildContext context;
   final IconData icon;
 
   @override
@@ -211,11 +205,9 @@ class QuestionNavButton extends StatelessWidget {
 class AnswerNavButton extends StatelessWidget {
   const AnswerNavButton({
     super.key,
-    required this.context,
     required this.text,
   });
 
-  final BuildContext context;
   final String text;
 
   @override

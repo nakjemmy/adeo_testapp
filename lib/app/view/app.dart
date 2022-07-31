@@ -11,6 +11,8 @@ import 'package:adeo_testapp/theme/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
+import '../../diagnostic_test/view/diagnostic_test_review_page.dart';
+
 class App extends StatelessWidget {
   const App({super.key});
 
@@ -41,7 +43,7 @@ class App extends StatelessWidget {
         GlobalMaterialLocalizations.delegate,
       ],
       supportedLocales: AppLocalizations.supportedLocales,
-      home: const DiagnosticTestPage(),
+      home: const DiagnosticTestReviewPage(),
     );
   }
 }
