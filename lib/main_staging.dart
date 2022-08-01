@@ -9,5 +9,5 @@ import 'package:adeo_testapp/app/app.dart';
 import 'package:adeo_testapp/bootstrap.dart';
 
 void main() {
-  bootstrap(() => const App());
+  bootstrap(App.new);
 }

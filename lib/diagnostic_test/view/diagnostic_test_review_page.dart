@@ -1,3 +1,4 @@
+import 'package:adeo_testapp/diagnostic_test/widgets/diagnostic_test_review_section_header.dart';
 import 'package:adeo_testapp/theme/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_switch/flutter_switch.dart';
@@ -115,8 +116,8 @@ class DiagnosticTestView extends StatelessWidget {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Row(
-                                children: [],
+                              const Expanded(
+                                child: DiagnosticTestReviewSectionsHeader(),
                               ),
                               OutlinedButton(
                                 onPressed: () {},
@@ -417,6 +418,12 @@ class MainScoreSummary extends StatelessWidget {
             fontSize: 40,
             fontWeight: FontWeight.w800,
             color: AppColors.reviewDarkTextColor,
+            shadows: <Shadow>[
+              Shadow(
+                blurRadius: 2,
+                color: AppColors.reviewDarkTextColor,
+              ),
+            ],
           ),
         ),
         Text(

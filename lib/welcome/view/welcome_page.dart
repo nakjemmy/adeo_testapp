@@ -1,4 +1,8 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+
+import '../../routes.gr.dart';
+import '../../theme/colors.dart';
 
 class WelcomePage extends StatelessWidget {
   const WelcomePage({super.key});
@@ -34,6 +38,13 @@ class WelcomeView extends StatelessWidget {
                 fontFamily: 'Hamelin',
                 fontSize: 50,
                 color: Colors.white,
+                shadows: <Shadow>[
+                  Shadow(
+                    offset: Offset(0, 2),
+                    blurRadius: 5,
+                    color: AppColors.reviewDarkTextColor,
+                  ),
+                ],
               ),
               textAlign: TextAlign.center,
             ),
@@ -70,7 +81,8 @@ class WelcomeView extends StatelessWidget {
               width: 200,
               height: 60,
               child: OutlinedButton(
-                onPressed: () => print('Hello Jerry'),
+                onPressed: () =>
+                    context.router.push(const DiagnosticTestRoute()),
                 style: Theme.of(context).elevatedButtonTheme.style,
                 child: const Text(
                   "Let's Go",
