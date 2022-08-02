@@ -73,21 +73,42 @@ class DiagnosticTestView extends StatelessWidget {
                           Expanded(
                             child: SizedBox(
                               child: Padding(
-                                padding: const EdgeInsets.only(
-                                    top: 100, left: 20, right: 20, bottom: 50),
-                                child: ListView(
-                                  children: [
-                                    ...List.generate(40, (index) => index)
-                                        .map((e) => SizedBox(
-                                              height: 50,
-                                              child: Card(
-                                                child: Center(
-                                                    child: Text(e.toString())),
-                                              ),
-                                            ))
-                                  ],
-                                ),
-                              ),
+                                  padding: const EdgeInsets.only(
+                                    top: 100,
+                                    left: 40,
+                                    right: 40,
+                                    bottom: 50,
+                                  ),
+                                  child: Column(
+                                    children: const [
+                                      Text(
+                                        'The Story of Ananse',
+                                        style: TextStyle(
+                                          fontFamily: 'Hamelin',
+                                          fontSize: 50,
+                                          color: Color(0xFFa5d0ff),
+                                          shadows: <Shadow>[
+                                            Shadow(
+                                              offset: Offset(0, 2),
+                                              blurRadius: 5,
+                                              color:
+                                                  AppColors.reviewDarkTextColor,
+                                            ),
+                                          ],
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                      SizedBox(height: 50),
+                                      Text(
+                                        'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+                                        style: TextStyle(
+                                          fontSize: 22,
+                                          color: Colors.white,
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ],
+                                  )),
                             ),
                           ),
                           const QuestionNavButton(
