@@ -1,6 +1,9 @@
+import 'package:adeo_testapp/diagnostic_test/bloc/diagnostic_test_bloc.dart';
 import 'package:adeo_testapp/diagnostic_test/widgets/diagnostic_test_review_section_header.dart';
 import 'package:adeo_testapp/theme/colors.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_switch/flutter_switch.dart';
 
 class DiagnosticTestReviewPage extends StatelessWidget {
@@ -15,12 +18,12 @@ class DiagnosticTestReviewPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const DiagnosticTestView();
+    return const DiagnosticTestReviewView();
   }
 }
 
-class DiagnosticTestView extends StatelessWidget {
-  const DiagnosticTestView({super.key});
+class DiagnosticTestReviewView extends StatelessWidget {
+  const DiagnosticTestReviewView({super.key});
 
   bool get questionHasExplanation => true;
   bool get isShowingQuestionDetails => true;
@@ -50,13 +53,13 @@ class DiagnosticTestView extends StatelessWidget {
                         ClipRRect(
                           borderRadius: BorderRadius.circular(30),
                           child: ColoredBox(
-                            color: AppColors.reviewPrimaryColor,
+                            color: AppColors.primaryBlue,
                             child:
                                 LayoutBuilder(builder: (context, constraints) {
                               return ToggleButtons(
                                 isSelected: const [true, false],
                                 fillColor: const Color(0xFF2589ce),
-                                selectedColor: AppColors.reviewPrimaryColor,
+                                selectedColor: AppColors.primaryBlue,
                                 borderWidth: 0,
                                 borderColor: Colors.transparent,
                                 children: <Widget>[
@@ -122,7 +125,7 @@ class DiagnosticTestView extends StatelessWidget {
                               OutlinedButton(
                                 onPressed: () {},
                                 style: OutlinedButton.styleFrom(
-                                  primary: AppColors.reviewPrimaryColor,
+                                  primary: AppColors.primaryBlue,
                                   side: const BorderSide(
                                     color: AppColors.reviewBodyTextColor,
                                   ),
@@ -147,17 +150,25 @@ class DiagnosticTestView extends StatelessWidget {
                           ),
                           const SizedBox(height: 50),
                           Expanded(
-                            child: ListView.builder(
-                              itemCount: 6,
-                              itemBuilder: (BuildContext context, int index) {
-                                return Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 20),
-                                  child: ReviewQuestionItem(
-                                    text:
-                                        'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse',
-                                    index: index,
-                                  ),
+                            child: BlocBuilder<DiagnosticTestBloc,
+                                DiagnosticTestState>(
+                              builder: (context, state) {
+                                return ListView.builder(
+                                  itemCount:
+                                      state.currentFilteredQuestions.length,
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
+                                    final question =
+                                        state.currentFilteredQuestions[index];
+                                    return Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 20),
+                                      child: ReviewQuestionItem(
+                                        text: question.text,
+                                        index: index,
+                                      ),
+                                    );
+                                  },
                                 );
                               },
                             ),
@@ -285,33 +296,48 @@ class DiagnosticTestView extends StatelessWidget {
               const Text(
                 '%',
                 style: TextStyle(
-                  color: AppColors.reviewPrimaryColor,
+                  color: AppColors.primaryBlue,
                   fontSize: 25,
                 ),
               ),
               const SizedBox(width: 7),
-              FlutterSwitch(
-                value: false,
-                toggleSize: 15,
-                height: 20,
-                width: 40,
-                activeColor: AppColors.reviewPrimaryColor,
-                onToggle: (val) {},
+              BlocBuilder<DiagnosticTestBloc, DiagnosticTestState>(
+                builder: (context, state) {
+                  return FlutterSwitch(
+                    value: state.showTopicScoreAsPercentage,
+                    toggleSize: 15,
+                    height: 20,
+                    width: 40,
+                    activeColor: AppColors.primaryBlue,
+                    onToggle: (val) {
+                      context
+                          .read<DiagnosticTestBloc>()
+                          .add(ReviewtTopicsScorePercentageDisplayToggled());
+                    },
+                  );
+                },
               ),
             ],
           ),
         ),
         Expanded(
-          child: ListView.builder(
-            itemCount: 4,
-            itemBuilder: (context, index) {
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 30),
-                child: TopicItem(
-                  index: index,
-                  title: 'Cells',
-                  remarks: 'Excellent perfomance',
-                ),
+          child: BlocBuilder<DiagnosticTestBloc, DiagnosticTestState>(
+            builder: (context, state) {
+              return ListView.builder(
+                itemCount: 4,
+                itemBuilder: (context, index) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 30),
+                    child: TopicItem(
+                      index: index,
+                      score: 8,
+                      total: 10,
+                      title: 'Cells',
+                      remarks: 'Excellent perfomance',
+                      asPercentage: state.showTopicScoreAsPercentage,
+                    ),
+                  );
+                },
               );
             },
           ),
@@ -327,6 +353,8 @@ class TopicItem extends StatelessWidget {
     required this.index,
     required this.title,
     required this.remarks,
+    required this.total,
+    required this.score,
     this.asPercentage = false,
     this.isSelected = false,
   });
@@ -336,13 +364,15 @@ class TopicItem extends StatelessWidget {
   final String remarks;
   final bool asPercentage;
   final bool isSelected;
+  final int total;
+  final int score;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 70,
       padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-      color: isSelected ? AppColors.reviewPrimaryColor : Colors.white,
+      color: isSelected ? AppColors.primaryBlue : Colors.white,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -367,24 +397,37 @@ class TopicItem extends StatelessWidget {
               ),
             ],
           ),
-          RichText(
-            text: TextSpan(
-              text: '8',
-              style: TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: 25,
-                color: isSelected ? Colors.white : AppColors.reviewPrimaryColor,
-              ),
-              children: const <TextSpan>[
-                TextSpan(
-                  text: '/10',
-                  style: TextStyle(
-                    fontWeight: FontWeight.w400,
-                    fontSize: 14,
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 150),
+            child: asPercentage
+                ? Text(
+                    '${((score / total) * 100).toStringAsFixed(0)}%',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 25,
+                      color: isSelected ? Colors.white : AppColors.primaryBlue,
+                    ),
+                  )
+                : RichText(
+                    text: TextSpan(
+                      text: '$score',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 25,
+                        color:
+                            isSelected ? Colors.white : AppColors.primaryBlue,
+                      ),
+                      children: <TextSpan>[
+                        TextSpan(
+                          text: '/$total',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w400,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
-            ),
           )
         ],
       ),
@@ -399,13 +442,20 @@ class MainScoreSummary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: [
-        buildSummaryItem('85%', 'Score'),
-        buildSummaryItem('01:30', 'Time taken'),
-        buildSummaryItem('40', 'Questions'),
-      ],
+    return BlocBuilder<DiagnosticTestBloc, DiagnosticTestState>(
+      builder: (context, state) {
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            buildSummaryItem(
+              ((state.score / state.totalQuestions) * 100).toStringAsFixed(0),
+              'Score',
+            ),
+            buildSummaryItem('01:30', 'Time taken'),
+            buildSummaryItem(state.questions.length.toString(), 'Questions'),
+          ],
+        );
+      },
     );
   }
 
@@ -495,7 +545,7 @@ class ReviewQuestionItem extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         border: Border.all(
-          color: AppColors.reviewPrimaryColor,
+          color: AppColors.primaryBlue,
         ),
         borderRadius: BorderRadius.circular(5),
         color: AppColors.secondaryColor,
@@ -505,12 +555,15 @@ class ReviewQuestionItem extends StatelessWidget {
         child: Row(
           children: [
             Expanded(
-              child: Text(
-                text,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 22,
-                ),
+              child: Html(
+                data: text,
+                style: {
+                  // tables will have the below background color
+                  '*': Style(
+                    color: Colors.white,
+                    fontSize: const FontSize(25),
+                  ),
+                },
               ),
             ),
             SizedBox(
@@ -526,6 +579,7 @@ class ReviewQuestionItem extends StatelessWidget {
                     activeColor: const Color(0xFF00abe0),
                     onToggle: (val) {},
                   ),
+                  const SizedBox(height: 40),
                   CircleAvatar(
                     radius: 15,
                     backgroundColor: index.isEven
@@ -565,7 +619,7 @@ class ReviewGroupButtonItem extends StatelessWidget {
           elevation: 0,
           side: BorderSide.none,
           backgroundColor: Colors.white,
-          primary: AppColors.reviewPrimaryColor,
+          primary: AppColors.primaryBlue,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(2),
           ),

@@ -1,6 +1,7 @@
 name: adeo_testapp
 
-on: [pull_request, push]
+on: [release]
+# on: [release, push]
 
 jobs:
   semantic-pull-request:

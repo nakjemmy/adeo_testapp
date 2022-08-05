@@ -1,8 +1,11 @@
 // ignore_for_file: avoid_unnecessary_containers
 
+import 'package:adeo_testapp/diagnostic_test/bloc/diagnostic_test_bloc.dart';
+import 'package:adeo_testapp/diagnostic_test/bloc/timer_bloc.dart';
+import 'package:adeo_testapp/theme/colors.dart';
 import 'package:flutter/material.dart';
-
-import '../../theme/colors.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 class DiagnosticTestHeader extends StatelessWidget {
   const DiagnosticTestHeader({
@@ -18,9 +21,12 @@ class DiagnosticTestHeader extends StatelessWidget {
         width: double.maxFinite,
         child: Stack(
           children: [
-            const SizedBox(
+            SizedBox(
               width: 400,
-              child: QuestionNumbers(),
+              child: BlocBuilder<DiagnosticTestBloc, DiagnosticTestState>(
+                  builder: (context, state) {
+                return QuestionNumbers();
+              }),
             ),
             Positioned(
               top: 0,
@@ -48,13 +54,10 @@ class DiagnosticTestHeader extends StatelessWidget {
                             ),
                           ),
                         ),
-                        child: const Text(
-                          '01:02',
-                          style: TextStyle(
-                            color: AppColors.primaryColor,
-                            fontSize: 25,
-                            fontWeight: FontWeight.w600,
-                          ),
+                        child: BlocBuilder<TimerBloc, TimerState>(
+                          builder: (context, state) {
+                            return const TimerText();
+                          },
                         ),
                       ),
                     ),
@@ -69,41 +72,98 @@ class DiagnosticTestHeader extends StatelessWidget {
   }
 }
 
-class QuestionNumbers extends StatelessWidget {
-  const QuestionNumbers({super.key});
+class TimerText extends StatelessWidget {
+  const TimerText({
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final data = List.generate(20, (index) => index + 1);
-    final selectedIndex = data[0];
+    final duration = context.select((TimerBloc bloc) => bloc.state.duration);
+    final minutesStr =
+        ((duration / 60) % 60).floor().toString().padLeft(2, '0');
+    final secondsStr = (duration % 60).toString().padLeft(2, '0');
+
+    return Text(
+      '$minutesStr:$secondsStr',
+      style: const TextStyle(
+        color: AppColors.primaryColor,
+        fontSize: 25,
+        fontWeight: FontWeight.w600,
+      ),
+    );
+  }
+}
+
+class QuestionNumbers extends StatelessWidget {
+  QuestionNumbers({
+    super.key,
+  });
+
+  final ItemScrollController itemScrollController = ItemScrollController();
+  final ItemPositionsListener itemPositionsListener =
+      ItemPositionsListener.create();
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: data.length,
-        itemBuilder: (context, index) {
-          final selected = index == selectedIndex;
-          return Padding(
-            padding: const EdgeInsets.all(8),
-            child: Column(
-              children: [
-                Text(
-                  data[index].toString(),
-                  style: TextStyle(
-                    color: selected ? Colors.white : Colors.white54,
-                    fontSize: 40,
-                  ),
-                ),
-                if (selected)
-                  Container(
-                    width: 40,
-                    height: 5,
-                    color: Colors.white,
-                  )
-              ],
-            ),
-          );
+      padding: const EdgeInsets.only(left: 24, right: 24, top: 20),
+      child: BlocListener<DiagnosticTestBloc, DiagnosticTestState>(
+        listener: (context, state) {
+          final isCurrentlyVisible = itemPositionsListener.itemPositions.value
+              .toList()
+              .where((e) => e.index == state.currentQuestionIndex)
+              .isNotEmpty;
+          if (!isCurrentlyVisible) {
+            itemScrollController.scrollTo(
+              index: state.currentQuestionIndex,
+              duration: const Duration(milliseconds: 500),
+            );
+          }
         },
+        child: BlocBuilder<DiagnosticTestBloc, DiagnosticTestState>(
+          builder: (context, state) {
+            return ScrollablePositionedList.builder(
+              itemScrollController: itemScrollController,
+              itemPositionsListener: itemPositionsListener,
+              initialScrollIndex: state.currentQuestionIndex,
+              itemCount: state.questions.length,
+              scrollDirection: Axis.horizontal,
+              itemBuilder: (context, index) {
+                final selected = index == state.currentQuestionIndex;
+                return InkWell(
+                  onTap: () {
+                    context.read<DiagnosticTestBloc>().add(
+                          DiagnosticTestCurrentQuestionChanged(
+                            index: index,
+                          ),
+                        );
+                  },
+                  child: SizedBox(
+                    width: 60,
+                    child: Column(
+                      children: [
+                        Text(
+                          (index + 1).toString(),
+                          style: TextStyle(
+                            color: selected ? Colors.white : Colors.white54,
+                            fontSize: 40,
+                          ),
+                        ),
+                        if (selected)
+                          Container(
+                            width: 40,
+                            height: 5,
+                            color: Colors.white,
+                          )
+                      ],
+                    ),
+                  ),
+                );
+              },
+            );
+          },
+        ),
       ),
     );
   }

@@ -8,8 +8,10 @@ environment:
   flutter: 3.0.4
 
 dependencies:
+  animate_do: ^2.1.0
   auto_route: ^4.2.1
   bloc: ^8.0.3
+  equatable: ^2.0.3
   flutter:
     sdk: flutter
   flutter_bloc: ^8.0.1
@@ -18,7 +20,12 @@ dependencies:
     sdk: flutter
   flutter_switch: ^0.3.2
   google_fonts: ^3.0.1
+  http: ^0.13.5
+  hydrated_bloc: ^8.1.0
   intl: ^0.17.0
+  json_annotation: ^4.6.0
+  json_serializable: ^6.3.1
+  scrollable_positioned_list: ^0.3.2
 
 dev_dependencies:
   bloc_test: ^9.0.3

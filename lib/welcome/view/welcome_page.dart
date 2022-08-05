@@ -56,7 +56,7 @@ class WelcomeView extends StatelessWidget {
                       ),
                       child: const Text(
                         'Skip',
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: AppColors.primaryColor,
                           fontSize: 20,
                         ),
