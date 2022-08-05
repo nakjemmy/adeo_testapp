@@ -11,13 +11,11 @@ import 'package:adeo_testapp/diagnostic_test/bloc/timer_bloc.dart';
 import 'package:adeo_testapp/diagnostic_test/repositories/diagnostic_test_repository.dart';
 import 'package:adeo_testapp/diagnostic_test/timer.dart';
 import 'package:adeo_testapp/l10n/l10n.dart';
+import 'package:adeo_testapp/routes.gr.dart';
 import 'package:adeo_testapp/theme/colors.dart';
-import 'package:adeo_testapp/welcome/view/welcome_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-
-import '../../routes.gr.dart';
 
 class App extends StatelessWidget {
   App({super.key});

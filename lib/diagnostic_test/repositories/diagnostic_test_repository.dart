@@ -12,10 +12,10 @@ class DiagnosticTestRepository {
   Future<List<Question>> getQuestions({
     int levelId = 1,
     int courseId = 1,
-    int limit = 20,
+    int limit = 5,
   }) async {
-    final result = await _diagnosticTestApi.getQuestions();
-    print(result);
+    final result = await _diagnosticTestApi.getQuestions(
+        levelId: levelId, courseId: courseId, limit: limit);
     return result;
   }
 }

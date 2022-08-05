@@ -1,12 +1,10 @@
 import 'dart:async';
-import 'dart:collection';
-import 'dart:ffi';
-
 import 'package:adeo_testapp/diagnostic_test/models/answer.dart';
 import 'package:adeo_testapp/diagnostic_test/models/question.dart';
 import 'package:adeo_testapp/diagnostic_test/repositories/diagnostic_test_repository.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:rxdart/rxdart.dart';
 
 part 'diagnostic_test_event.dart';
 part 'diagnostic_test_state.dart';
@@ -22,6 +20,7 @@ class DiagnosticTestBloc
     );
     on<DiagnosticTestNextQuestionRequested>(
       _onDiagnosticTestNextQuestionRequested,
+      // transformer: debounce(const Duration(milliseconds: 2000)),
     );
     on<DiagnosticTestPreviousQuestionRequested>(
       _onDiagnosticTestPreviousQuestionRequested,
@@ -37,6 +36,10 @@ class DiagnosticTestBloc
     );
   }
 
+  EventTransformer<T> debounce<T>(Duration duration) {
+    return (events, mapper) => events.debounceTime(duration).switchMap(mapper);
+  }
+
   final DiagnosticTestRepository diagnosticTestRepository;
 
   Future<void> _onDiagnosticTestLoaded(
@@ -44,7 +47,7 @@ class DiagnosticTestBloc
     Emitter<DiagnosticTestState> emit,
   ) async {
     try {
-      final questions = await diagnosticTestRepository.getQuestions();
+      final questions = await diagnosticTestRepository.getQuestions(limit: 5);
 
       emit(
         state.copyWith(
@@ -54,7 +57,6 @@ class DiagnosticTestBloc
       );
     } catch (e, s) {
       addError(e, s);
-      print(s);
       emit(
         state.copyWith(
           status: DiagnosticTestStatus.failure,

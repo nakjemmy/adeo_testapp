@@ -2,6 +2,7 @@
 
 import 'package:adeo_testapp/diagnostic_test/bloc/diagnostic_test_bloc.dart';
 import 'package:adeo_testapp/diagnostic_test/bloc/timer_bloc.dart';
+import 'package:adeo_testapp/helpers.dart';
 import 'package:adeo_testapp/theme/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -80,12 +81,10 @@ class TimerText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final duration = context.select((TimerBloc bloc) => bloc.state.duration);
-    final minutesStr =
-        ((duration / 60) % 60).floor().toString().padLeft(2, '0');
-    final secondsStr = (duration % 60).toString().padLeft(2, '0');
+    final timerString = getTimerString(duration);
 
     return Text(
-      '$minutesStr:$secondsStr',
+      timerString,
       style: const TextStyle(
         color: AppColors.primaryColor,
         fontSize: 25,

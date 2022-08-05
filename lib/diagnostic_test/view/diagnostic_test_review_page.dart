@@ -1,5 +1,8 @@
 import 'package:adeo_testapp/diagnostic_test/bloc/diagnostic_test_bloc.dart';
+import 'package:adeo_testapp/diagnostic_test/bloc/timer_bloc.dart';
+import 'package:adeo_testapp/diagnostic_test/models/question.dart';
 import 'package:adeo_testapp/diagnostic_test/widgets/diagnostic_test_review_section_header.dart';
+import 'package:adeo_testapp/helpers.dart';
 import 'package:adeo_testapp/theme/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -164,8 +167,7 @@ class DiagnosticTestReviewView extends StatelessWidget {
                                       padding: const EdgeInsets.symmetric(
                                           vertical: 20),
                                       child: ReviewQuestionItem(
-                                        text: question.text,
-                                        index: index,
+                                        question: question,
                                       ),
                                     );
                                   },
@@ -442,16 +444,21 @@ class MainScoreSummary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final duration = context.select((TimerBloc bloc) => bloc.state.duration);
+
     return BlocBuilder<DiagnosticTestBloc, DiagnosticTestState>(
       builder: (context, state) {
         return Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             buildSummaryItem(
-              ((state.score / state.totalQuestions) * 100).toStringAsFixed(0),
+              '${((state.score / state.totalQuestions) * 100).toStringAsFixed(0)}%',
               'Score',
             ),
-            buildSummaryItem('01:30', 'Time taken'),
+            buildSummaryItem(
+              getTimerString(state.testTime - duration),
+              'Time taken',
+            ),
             buildSummaryItem(state.questions.length.toString(), 'Questions'),
           ],
         );
@@ -534,11 +541,9 @@ class AnswerItem extends StatelessWidget {
 class ReviewQuestionItem extends StatelessWidget {
   const ReviewQuestionItem({
     super.key,
-    required this.text,
-    required this.index,
+    required this.question,
   });
-  final String text;
-  final int index;
+  final Question question;
 
   @override
   Widget build(BuildContext context) {
@@ -556,7 +561,7 @@ class ReviewQuestionItem extends StatelessWidget {
           children: [
             Expanded(
               child: Html(
-                data: text,
+                data: question.text,
                 style: {
                   // tables will have the below background color
                   '*': Style(
@@ -580,16 +585,23 @@ class ReviewQuestionItem extends StatelessWidget {
                     onToggle: (val) {},
                   ),
                   const SizedBox(height: 40),
-                  CircleAvatar(
-                    radius: 15,
-                    backgroundColor: index.isEven
-                        ? Theme.of(context).primaryColor
-                        : Colors.red,
-                    child: Icon(
-                      index.isEven ? Icons.check : Icons.close,
-                      size: 20,
-                      color: Colors.white,
-                    ),
+                  BlocBuilder<DiagnosticTestBloc, DiagnosticTestState>(
+                    builder: (context, state) {
+                      return CircleAvatar(
+                        radius: 15,
+                        backgroundColor:
+                            isCorrect(state.correctlyAnsweredQuestions)
+                                ? Theme.of(context).primaryColor
+                                : Colors.red,
+                        child: Icon(
+                          isCorrect(state.correctlyAnsweredQuestions)
+                              ? Icons.check
+                              : Icons.close,
+                          size: 20,
+                          color: Colors.white,
+                        ),
+                      );
+                    },
                   ),
                 ],
               ),
@@ -598,6 +610,12 @@ class ReviewQuestionItem extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  bool isCorrect(List<Question> correctlyAnsweredQuestions) {
+    return correctlyAnsweredQuestions
+        .where((e) => e.id == question.id)
+        .isNotEmpty;
   }
 }
 

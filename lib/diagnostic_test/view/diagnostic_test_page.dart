@@ -1,8 +1,6 @@
 import 'package:adeo_testapp/diagnostic_test/bloc/diagnostic_test_bloc.dart';
 import 'package:adeo_testapp/diagnostic_test/bloc/timer_bloc.dart';
 import 'package:adeo_testapp/diagnostic_test/models/answer.dart';
-import 'package:adeo_testapp/diagnostic_test/repositories/diagnostic_test_repository.dart';
-import 'package:adeo_testapp/diagnostic_test/timer.dart';
 import 'package:adeo_testapp/diagnostic_test/widgets/diagnostic_test_header.dart';
 import 'package:adeo_testapp/routes.gr.dart';
 import 'package:adeo_testapp/theme/colors.dart';
@@ -46,7 +44,9 @@ class DiagnosticTestView extends StatelessWidget {
               if (state.status == DiagnosticTestStatus.success &&
                   timerState is! TimerRunInProgress &&
                   timerState is! TimerRunComplete) {
-                context.read<TimerBloc>().add(const TimerStarted(duration: 2));
+                context
+                    .read<TimerBloc>()
+                    .add(TimerStarted(duration: state.testTime));
               }
             },
           ),
@@ -236,56 +236,51 @@ class DiagnosticTestView extends StatelessWidget {
   }
 
   Widget buildAnswerSection(List<Answer> answers) {
-    return BlocListener<DiagnosticTestBloc, DiagnosticTestState>(
-      listenWhen: (previous, current) =>
-          previous.chosenAnswers != current.chosenAnswers,
-      listener: (context, state) {
-        Future.delayed(
-          const Duration(milliseconds: 2000),
-          () => context.read<DiagnosticTestBloc>().add(
-                DiagnosticTestNextQuestionRequested(),
-              ),
-        );
-      },
-      child: Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 120,
-          vertical: 30,
-        ),
-        color: AppColors.darkBlue,
-        child: Column(
-          children: [
-            const SizedBox(height: 50),
-            Expanded(
-              child: ListView.builder(
-                itemCount: answers.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return AnswerOption(
-                    answer: answers[index],
-                  );
-                },
-              ),
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 120,
+        vertical: 30,
+      ),
+      color: AppColors.darkBlue,
+      child: Column(
+        children: [
+          const SizedBox(height: 50),
+          Expanded(
+            child: ListView.builder(
+              itemCount: answers.length,
+              itemBuilder: (BuildContext context, int index) {
+                return AnswerOption(
+                  answer: answers[index],
+                );
+              },
             ),
-            const SizedBox(height: 50),
-            Row(
-              children: const [
-                Expanded(
-                  child: QuestionNavButton(
-                    text: 'Previous',
-                    type: NavType.prev,
+          ),
+          const SizedBox(height: 50),
+          BlocBuilder<DiagnosticTestBloc, DiagnosticTestState>(
+            builder: (context, state) {
+              return Row(
+                children: [
+                  const Expanded(
+                    child: QuestionNavButton(
+                      text: 'Previous',
+                      type: NavType.prev,
+                    ),
                   ),
-                ),
-                SizedBox(width: 1),
-                Expanded(
-                  child: QuestionNavButton(
-                    text: 'Next',
-                    type: NavType.next,
+                  const SizedBox(width: 1),
+                  Expanded(
+                    child: QuestionNavButton(
+                      text: state.currentQuestionIndex ==
+                              state.questions.length - 1
+                          ? 'Submit'
+                          : 'Next',
+                      type: NavType.next,
+                    ),
                   ),
-                ),
-              ],
-            )
-          ],
-        ),
+                ],
+              );
+            },
+          )
+        ],
       ),
     );
   }
@@ -466,13 +461,26 @@ class QuestionNavButton extends StatelessWidget {
     return SizedBox(
       height: 50,
       child: ElevatedButton(
-        onPressed: () => type == NavType.next
-            ? context
-                .read<DiagnosticTestBloc>()
-                .add(DiagnosticTestNextQuestionRequested())
-            : context
-                .read<DiagnosticTestBloc>()
-                .add(DiagnosticTestPreviousQuestionRequested()),
+        onPressed: () async {
+          final diagnosticTestBloc = context.read<DiagnosticTestBloc>();
+
+          if (diagnosticTestBloc.state.currentQuestionIndex ==
+                  (diagnosticTestBloc.state.questions.length - 1) &&
+              type == NavType.next) {
+            context.read<TimerBloc>().add(const TimerPaused());
+
+            final result = await _confirmSubmission(context);
+
+            if (result == true) {
+              await context.router.replace(const DiagnosticTestReviewRoute());
+            }
+          }
+
+          type == NavType.next
+              ? diagnosticTestBloc.add(DiagnosticTestNextQuestionRequested())
+              : diagnosticTestBloc
+                  .add(DiagnosticTestPreviousQuestionRequested());
+        },
         style: ElevatedButton.styleFrom(
           elevation: 0,
           side: BorderSide.none,
@@ -485,6 +493,58 @@ class QuestionNavButton extends StatelessWidget {
           child: Text(text),
         ),
       ),
+    );
+  }
+
+  Future<bool?> _confirmSubmission(BuildContext context) async {
+    return showDialog<bool>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Center(child: Text('Confirm Submission')),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: const <Widget>[
+                Center(child: Text('Are you sure you want to submit?')),
+              ],
+            ),
+          ),
+          actionsAlignment: MainAxisAlignment.center,
+          actions: <Widget>[
+            TextButton(
+              style: TextButton.styleFrom(
+                primary: AppColors.secondaryColor,
+              ),
+              child: const Padding(
+                padding: EdgeInsets.all(8),
+                child: Text(
+                  'Cancel',
+                  style: TextStyle(fontSize: 16),
+                ),
+              ),
+              onPressed: () {
+                context.router.pop(false);
+              },
+            ),
+            TextButton(
+              style: TextButton.styleFrom(
+                primary: AppColors.primaryColor,
+              ),
+              child: const Padding(
+                padding: EdgeInsets.all(8),
+                child: Text(
+                  'Yes',
+                  style: TextStyle(fontSize: 16),
+                ),
+              ),
+              onPressed: () {
+                context.router.pop(true);
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }

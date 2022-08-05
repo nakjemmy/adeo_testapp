@@ -18,6 +18,7 @@ class DiagnosticTestState extends Equatable {
     this.chosenAnswers = const {},
     this.reviewQuestionFilterType = ReviewQuestionsFilterType.all,
     this.showTopicScoreAsPercentage = false,
+    this.testTime = 10,
   });
 
   final DiagnosticTestStatus status;
@@ -27,6 +28,7 @@ class DiagnosticTestState extends Equatable {
   final Map<int, int> chosenAnswers;
   final ReviewQuestionsFilterType reviewQuestionFilterType;
   final bool showTopicScoreAsPercentage;
+  final int testTime;
 
   DiagnosticTestState copyWith({
     DiagnosticTestStatus? status,
